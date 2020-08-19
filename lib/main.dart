@@ -131,6 +131,44 @@ String ip_adress='';
     }
   }
 
+  Widget widgetSwitcher(){
+    switch(running){
+      case false:
+        return MaterialButton(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.wifi_tethering,color: Colors.grey[500],),
+              Icon(Icons.computer,color: Colors.grey[500],),
+              Text('Tap to start server sharing',style: TextStyle(
+                color: Colors.grey[100],fontSize: 18
+              ),)
+            ],
+          ),
+          onPressed:(){
+                if(!running){
+                startServer();
+                }
+              },
+        );
+      case true:
+        return MaterialButton(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.wifi_tethering,color: Colors.grey[300],),
+              Icon(Icons.computer,color: Colors.grey[300],),
+              Text('Tap to stop server sharing',style: TextStyle(
+                color: Colors.grey[100],fontSize: 18
+              ),),
+              SizedBox
+            ],
+          ),
+          onPressed:stopServer
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,45 +179,13 @@ String ip_adress='';
         centerTitle: true,
       ),
       body: Center(
-        child: loading?Container(child: SpinKitFadingFour(color: Colors.blue,),): Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.wifi_tethering,color: Colors.grey[400],),
-            Icon(Icons.computer,color: Colors.grey[400],),
-            MaterialButton(
-              child: loadSwitcher(0),
-              color: Colors.blue,
-              onPressed: (){
-                if(!running){
-                startServer();
-                }
-              },
-            ),
-            MaterialButton(
-              child: Text('Stop Server',style: TextStyle(color: Colors.white),),
-              color: Colors.blue,
-              onPressed: (){
-                stopServer();
-              },
-            ),
-            MaterialButton(
-              child: Text('Select IMG',style: TextStyle(color: Colors.white),),
-              color: Colors.blue,
-              onPressed: (){
-                chooseFile();
-              },
-            ),
-            loadSwitcher(1),
-            SizedBox(height: 60,),
-            ip_adress.isNotEmpty?InkWell(
-              child: Text('Go to- http://$ip_adress:8000',style: TextStyle(
-                color: Colors.blue,fontSize: 18
-              ),),
-              onTap: ()=>launch('http://$ip_adress:8000'),
-            ):Text(''),
-          ],
-        ),
+        child: loading?Container(child: SpinKitFadingFour(color: Colors.grey[200],),): widgetSwitcher()
       ),
+      floatingActionButton: !running?SizedBox(height: 1,width: 1,):FloatingActionButton(
+        child: Icon(Icons.folder),
+        tooltip: "Select Files",
+        onPressed: chooseFile,
+      )
     );
   }
 }
