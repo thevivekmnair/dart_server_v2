@@ -134,14 +134,18 @@ String ip_adress='';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff1B2631),
       appBar: AppBar(
         title: Text('Dart Server'),
+        backgroundColor: Color(0xff283747),
         centerTitle: true,
       ),
       body: Center(
         child: loading?Container(child: SpinKitFadingFour(color: Colors.blue,),): Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Icon(Icons.wifi_tethering,color: Colors.grey[400],),
+            Icon(Icons.computer,color: Colors.grey[400],),
             MaterialButton(
               child: loadSwitcher(0),
               color: Colors.blue,
