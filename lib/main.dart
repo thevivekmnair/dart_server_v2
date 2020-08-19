@@ -36,8 +36,8 @@ String ip_adress='';
 
                 //Server statrter function
   void startServer()async{
-    Directory directory=Directory('/storage/');
-    await directory.list().forEach((FileSystemEntity element)=>print(element));
+    // Directory directory=Directory('/storage/');
+    // await directory.list().forEach((FileSystemEntity element)=>print(element));
     setState(() {
       loading=true;
     });
