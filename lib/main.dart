@@ -135,6 +135,8 @@ String ip_adress='';
     switch(running){
       case false:
         return MaterialButton(
+          key: UniqueKey(),
+          highlightColor: Color(0xff1B2631),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -153,15 +155,27 @@ String ip_adress='';
         );
       case true:
         return MaterialButton(
+          key: UniqueKey(),
+          highlightColor: Color(0xff1B2631),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text('Server running',style: TextStyle(
+                color: Colors.green[600],fontSize: 18
+              ),),
+              SizedBox(height: 20,),
               Icon(Icons.wifi_tethering,color: Colors.grey[300],),
               Icon(Icons.computer,color: Colors.grey[300],),
               Text('Tap to stop server sharing',style: TextStyle(
                 color: Colors.grey[100],fontSize: 18
               ),),
-              SizedBox
+             SizedBox(height: 60,),
+              ip_adress.isNotEmpty?InkWell(
+                child: Text('Go to- http://$ip_adress:8000',style: TextStyle(
+                  color: Colors.blue,fontSize: 18
+                ),),
+                onTap: ()=>launch('http://$ip_adress:8000'),
+              ):Text(''),
             ],
           ),
           onPressed:stopServer
@@ -179,7 +193,16 @@ String ip_adress='';
         centerTitle: true,
       ),
       body: Center(
-        child: loading?Container(child: SpinKitFadingFour(color: Colors.grey[200],),): widgetSwitcher()
+        child: loading?Container(child: SpinKitFadingFour(color: Colors.grey[200],),): AnimatedSwitcher(
+          child: widgetSwitcher(),
+          duration: Duration(milliseconds: 300),
+          transitionBuilder: (child,animation){
+            return FadeTransition(
+              child: child,
+              opacity: animation,
+            );
+          },
+        )
       ),
       floatingActionButton: !running?SizedBox(height: 1,width: 1,):FloatingActionButton(
         child: Icon(Icons.folder),
