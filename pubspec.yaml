@@ -34,9 +34,10 @@ dev_dependencies:
     sdk: flutter
   mime: ^0.9.7
   file_picker: ^1.13.3
-  wifi: ^0.1.5
   url_launcher: ^5.5.0
   flutter_spinkit: ^4.1.2+1
+  dart_server_plugin:
+    path: ./dart_server_plugin
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
