@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:flutter/services.dart';
@@ -12,28 +11,28 @@ class DartServerPlugin {
     return version;
   }
 
-  static Future<Map> get enableHotspot async{
-    final Map result=await _channel.invokeMethod('turnOnHotspot');
-    switch(result["status"]){
+  static Future<Map> get enableHotspot async {
+    final Map result = await _channel.invokeMethod('turnOnHotspot');
+    switch (result["status"]) {
       case "active":
-          return result;
-          break;
+        return result;
+        break;
       case "deactivated":
-          return result;
+        return result;
       case "failed":
-          return null;
+        return null;
     }
   }
 
-  static Future<Map<String,String>> get openFileManager async{
-    Map<String,String> resultMap={};
-    final Map files= await _channel.invokeMethod('OpenFileManager');
+  static Future<Map<String, String>> get openFileManager async {
+    Map<String, String> resultMap = {};
+    final Map files = await _channel.invokeMethod('OpenFileManager');
     files.forEach((key, value) {
-      resultMap.addAll({key:value});
-     });
-    if(resultMap.containsKey("null") && resultMap.containsValue("null")){
+      resultMap.addAll({key: value});
+    });
+    if (resultMap.containsKey("null") && resultMap.containsValue("null")) {
       return null;
     }
     return resultMap;
-  } 
+  }
 }
