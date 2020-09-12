@@ -13,14 +13,10 @@ class DartServerPlugin {
 
   static Future<Map> get enableHotspot async {
     final Map result = await _channel.invokeMethod('turnOnHotspot');
-    switch (result["status"]) {
-      case "active":
-        return result;
-        break;
-      case "deactivated":
-        return result;
-      case "failed":
-        return null;
+    if (result["ipadress"] == "null") {
+      return null;
+    } else {
+      return result;
     }
   }
 

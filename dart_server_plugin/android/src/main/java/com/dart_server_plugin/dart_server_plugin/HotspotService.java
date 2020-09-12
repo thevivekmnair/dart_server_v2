@@ -25,6 +25,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -40,6 +41,7 @@ public class HotspotService{
     public MethodChannel.Result result;
     private DartServerPlugin dartServerPlugin;
     private int locationrequestCode=10;
+    private int hotspottoggleCode=50;
 
     public HotspotService(Context context, Activity activity){
 
@@ -108,76 +110,130 @@ public class HotspotService{
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void startLocalOnlyHotspot(){
+     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public boolean checkHotspotState(){
+        Method method = null;
+        try {
+            method = wifiManager.getClass().getDeclaredMethod("getWifiApState");
+            method.setAccessible(true);
+            int actualState = (Integer) method.invoke(wifiManager, (Object[]) null);
+            if(actualState==11){
+                return false;
+            }
+            else {
+                return true;
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            System.out.println(e);
+            System.out.println("Failed....");
+        }
+        return false;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void turnOnMobileHotspot(){
         dartServerPlugin= new DartServerPlugin();
-        if(mReservation!=null){
-            mReservation.close();
-            mReservation=null;
-        }else {
-            wifiManager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
-                HashMap<String,String> hotspotCred=new HashMap<>();
-                @Override
-                public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
-                    super.onStarted(reservation);
-                    hotspotCred.clear();
-                    Log.d(TAG, "Wifi Hotspot is on now");
-                    mReservation = reservation;
-                    String ipAdress=getWifiApIpAddress();
-                    String password=mReservation.getWifiConfiguration().preSharedKey;
-                    String ssid=mReservation.getWifiConfiguration().SSID;
-                    System.out.println(password);
-                    hotspotCred.put("ssid",ssid);
-                    hotspotCred.put("password",password);
-                    hotspotCred.put("ipadress",ipAdress);
-                    hotspotCred.put("status","active");
-                    dartServerPlugin.returnResults(hotspotCred,result);
-                }
-
-                @Override
-                public void onStopped() {
-                    super.onStopped();
-                    hotspotCred.clear();
-                    Log.d(TAG, "onStopped: ");
-                    hotspotCred.put("status","deactivated");
-                }
-
-                @Override
-                public void onFailed(int reason) {
-//                (wifiManager.isWifiEnabled())
-                    super.onFailed(reason);
-                    hotspotCred.clear();
-                    Toast.makeText(context, "Turn off hotspot", Toast.LENGTH_LONG).show();
-                    final Intent intent=new Intent(Intent.ACTION_MAIN,null);
+        Method method = null;
+        HashMap<String,String> hotspotCred=new HashMap<>();
+        try {
+            method = wifiManager.getClass().getDeclaredMethod("getWifiApState");
+            method.setAccessible(true);
+            int actualState = (Integer) method.invoke(wifiManager, (Object[]) null);
+            switch(actualState){
+                case 11:
+                    Toast.makeText(context, "Turn hotspot ON", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(Intent.ACTION_MAIN,null);
                     intent.addCategory(Intent.CATEGORY_LAUNCHER);
                     final ComponentName cn=new ComponentName("com.android.settings","com.android.settings.TetherSettings");
                     intent.setComponent(cn);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    activity.startActivity(intent);
-                    Log.d(TAG, "onFailed: ");
-                    hotspotCred.put("status","failed");
+                    activity.startActivityForResult(intent,hotspottoggleCode);
+                    break;
+                case 13:
+                    System.out.println("13...");
+                    String ipAdress=getWifiApIpAddress();
+                    hotspotCred.put("ipadress",ipAdress);
                     dartServerPlugin.returnResults(hotspotCred,result);
-                }
-            }, new Handler());
+                    break;
+
+            }
+            System.out.println(actualState);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            System.out.println("Failed....");
         }
     }
 
+
+//     @RequiresApi(api = Build.VERSION_CODES.O)
+//     public void startLocalOnlyHotspot(){
+//         dartServerPlugin= new DartServerPlugin();
+//         if(mReservation!=null){
+//             mReservation.close();
+//             mReservation=null;
+//         }else {
+//             wifiManager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
+//                 HashMap<String,String> hotspotCred=new HashMap<>();
+//                 @Override
+//                 public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
+//                     super.onStarted(reservation);
+//                     hotspotCred.clear();
+//                     Log.d(TAG, "Wifi Hotspot is on now");
+//                     mReservation = reservation;
+//                     String ipAdress=getWifiApIpAddress();
+//                     String password=mReservation.getWifiConfiguration().preSharedKey;
+//                     String ssid=mReservation.getWifiConfiguration().SSID;
+//                     System.out.println(password);
+//                     hotspotCred.put("ssid",ssid);
+//                     hotspotCred.put("password",password);
+//                     hotspotCred.put("ipadress",ipAdress);
+//                     hotspotCred.put("status","active");
+//                     dartServerPlugin.returnResults(hotspotCred,result);
+//                 }
+
+//                 @Override
+//                 public void onStopped() {
+//                     super.onStopped();
+//                     hotspotCred.clear();
+//                     Log.d(TAG, "onStopped: ");
+//                     hotspotCred.put("status","deactivated");
+//                 }
+
+//                 @Override
+//                 public void onFailed(int reason) {
+// //                (wifiManager.isWifiEnabled())
+//                     super.onFailed(reason);
+//                     hotspotCred.clear();
+//                     Toast.makeText(context, "Turn off hotspot", Toast.LENGTH_LONG).show();
+//                     final Intent intent=new Intent(Intent.ACTION_MAIN,null);
+//                     intent.addCategory(Intent.CATEGORY_LAUNCHER);
+//                     final ComponentName cn=new ComponentName("com.android.settings","com.android.settings.TetherSettings");
+//                     intent.setComponent(cn);
+//                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                     activity.startActivity(intent);
+//                     Log.d(TAG, "onFailed: ");
+//                     hotspotCred.put("status","failed");
+//                     dartServerPlugin.returnResults(hotspotCred,result);
+//                 }
+//             }, new Handler());
+//         }
+//     }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void turnOnHotspot(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            if(!locationManager.isLocationEnabled()){
-                Toast.makeText(context, "Turn On location", Toast.LENGTH_LONG).show();
-                Intent intent= new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                activity.startActivity(intent);
-            }
-        }
-        if(checkForLoactionPermission()){
-            startLocalOnlyHotspot();
-        }
-        else{
-            askForLoacationPermission();
-        }
+        turnOnMobileHotspot();
+    //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    //         if(!locationManager.isLocationEnabled()){
+    //             Toast.makeText(context, "Turn On location", Toast.LENGTH_LONG).show();
+    //             Intent intent= new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+    //             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    //             activity.startActivity(intent);
+    //         }
+    //     }
+    //     if(checkForLoactionPermission()){
+    //         startLocalOnlyHotspot();
+    //     }
+    //     else{
+    //         askForLoacationPermission();
+    //     }
     }
 
 }

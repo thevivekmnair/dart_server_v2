@@ -75,10 +75,10 @@
             border: 1px solid black;
             border-radius: 5px;
             padding:10px;
-            border-color:#3e5772 ;
+            border-color:#1c3046 ;
         }
         button:hover{
-            background-color: black;
+            background-color: #1b2f44;
             color: white;
             transition: .5s;
             cursor: pointer;

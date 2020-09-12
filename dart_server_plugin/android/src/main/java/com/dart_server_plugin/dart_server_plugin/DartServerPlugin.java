@@ -124,6 +124,17 @@ public class DartServerPlugin implements FlutterPlugin, MethodCallHandler, Activ
           paths.put("null","null");
           resultvar.success(paths);
         }
+      case 50:
+        System.out.println("Hotspot....");
+        if(hotspotService.checkHotspotState()){
+          System.out.println("if...");
+          hotspotService.turnOnMobileHotspot();
+        }else{
+          System.out.println("else...");
+          HashMap<String,String> hotspotCred=new HashMap<>();
+          hotspotCred.put("ipadress","null");
+          resultvar.success(hotspotCred);
+        }
     }
     return true;
   }
@@ -136,7 +147,7 @@ public class DartServerPlugin implements FlutterPlugin, MethodCallHandler, Activ
         if(PackageManager.PERMISSION_GRANTED==grantResults[0]){
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           hotspotService.result=resultvar;
-            hotspotService.startLocalOnlyHotspot();
+            // hotspotService.startLocalOnlyHotspot();
           }
         }
         break;

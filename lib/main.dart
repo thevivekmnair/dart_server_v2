@@ -40,6 +40,15 @@ class _DartServerState extends State<DartServer> {
     socketFileShare = SocketFileShare();
   }
 
+  Stream<List<int>> downloadStream(Stream<List<int>> stream) async* {
+    int count = 0;
+    await for (var value in stream) {
+      count += value.length;
+      yield value;
+    }
+    print(count);
+  }
+
   void sendDownloadCompletedMsg(WebSocket wbs) {
     Map<String, String> download_msg = {};
     download_msg.addAll({"type": "downloadpermission", "data": 'true'});
@@ -51,8 +60,7 @@ class _DartServerState extends State<DartServer> {
     setState(() {
       loading = true;
     });
-    // hotspot = await DartServerPlugin.enableHotspot;
-    hotspot.addAll({'ipadress': '192.168.43.1'});
+    hotspot = await DartServerPlugin.enableHotspot;
     if (hotspot == null) {
       setState(() {
         loading = false;
@@ -95,10 +103,8 @@ class _DartServerState extends State<DartServer> {
               int start_time = 0;
               int stop_time = 0;
               stopwatch.start();
-              // print(lookupMimeType(file_abs_path));
-              // var file_stream=await _download_file.openRead();
-              // print(file_stream);
               int file_length = await _download_file.length();
+              print(file_length);
               start_time = stopwatch.elapsedMilliseconds;
               print(UriData.fromString('$val',
                   encoding: Encoding.getByName('utf-8')));
@@ -108,7 +114,8 @@ class _DartServerState extends State<DartServer> {
                 ..headers.set('Content-Length', '$file_length')
                 ..headers.set('Content-Disposition',
                     'attachment; filename="${UriData.fromString('$val', encoding: Encoding.getByName('utf-8'))}"');
-              await request.response.addStream(_download_file.openRead());
+              await request.response
+                  .addStream(downloadStream(_download_file.openRead()));
               stop_time = stopwatch.elapsedMilliseconds;
               while (stop_time - start_time < 1000) {
                 stop_time = stopwatch.elapsedMilliseconds;
@@ -188,10 +195,10 @@ class _DartServerState extends State<DartServer> {
   Widget widgetSwitcher() {
     switch (running) {
       case false:
-        return MaterialButton(
+        return IconButton(
           key: UniqueKey(),
           highlightColor: Color(0xff1B2631),
-          child: Column(
+          icon: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(

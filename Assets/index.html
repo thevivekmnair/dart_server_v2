@@ -33,12 +33,16 @@
         //     ws.send('Vivek m nair');
         // })
         var file_cache=[];
+        var downloadpermissionAllowed=false;
 
         function send_download_file_request(){
-            if(file_cache.length>0){
+            if(file_cache.length>0 && downloadpermissionAllowed){
                 var button_value= file_cache.shift();
                 const buttonpress=document.getElementById(button_value);
                 buttonpress.click();
+                downloadpermissionAllowed=false;
+            }else{
+                setTimeout(send_download_file_request,1000);
             }
         }
           
@@ -50,6 +54,7 @@
                 img_tag.setAttribute('src','data:image/jpeg;base64,'+eventmessgae['data']);
             }
             else if(eventmessgae['type']=='downloadpermission'){
+                downloadpermissionAllowed=true;
                 console.log(eventmessgae);
                 send_download_file_request();
             }

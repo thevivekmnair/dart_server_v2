@@ -6,29 +6,28 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:mime/mime.dart';
-import 'package:path_provider/path_provider.dart';
 
 class SocketFileShare {
   Map<WebSocket, int> file_shared_count;
-  String application_path;
   String base64_encode_cache_songicon = '';
   String base64_encode_cache_fileicon = '';
+  WebSocket previousWbs;
 
   SocketFileShare() {
     file_shared_count = {};
-    getapplicationDirectory();
-  }
-
-  void getapplicationDirectory() async {
-    Directory directory = await getApplicationDocumentsDirectory();
-    application_path = directory.path;
-    print(application_path);
   }
 
   int checkfileSharedCount(WebSocket wbs) {
-    if (file_shared_count != null && file_shared_count[wbs] != null) {
-      return file_shared_count[wbs];
+    if (file_shared_count.isNotEmpty) {
+      if (file_shared_count[wbs] != null) {
+        return file_shared_count[wbs];
+      } else {
+        file_shared_count.addAll({wbs: file_shared_count[previousWbs]});
+        previousWbs = wbs;
+        return file_shared_count[wbs];
+      }
     } else {
+      previousWbs = wbs;
       return 0;
     }
   }
