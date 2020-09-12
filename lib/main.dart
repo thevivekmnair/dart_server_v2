@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'FrontEnd.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:dart_server_plugin/dart_server_plugin.dart';
+import 'dart:convert';
+import 'package:dart_server_v2/socket_Fileshare.dart';
 
 void main() {
   runApp(MaterialApp(home: DartServer()));
@@ -22,26 +26,39 @@ class _DartServerState extends State<DartServer> {
   bool loading = false;
   bool running = false;
   String ip_adress = '';
-  var hotspot;
+  Map hotspot = {};
+  WebSocket socket;
+  SocketFileShare socketFileShare;
+  Stopwatch stopwatch = Stopwatch();
 
   HttpServer server;
   var img = [];
   List<String> file_path = [];
   Map<String, String> extention;
 
+  _DartServerState() {
+    socketFileShare = SocketFileShare();
+  }
+
+  void sendDownloadCompletedMsg(WebSocket wbs) {
+    Map<String, String> download_msg = {};
+    download_msg.addAll({"type": "downloadpermission", "data": 'true'});
+    wbs.add(jsonEncode(download_msg));
+  }
+
   //Server statrter function
-  void startServer() async {
+  void serverHandler() async {
     setState(() {
       loading = true;
     });
-    hotspot = await DartServerPlugin.enableHotspot;
+    // hotspot = await DartServerPlugin.enableHotspot;
+    hotspot.addAll({'ipadress': '192.168.43.1'});
     if (hotspot == null) {
       setState(() {
         loading = false;
       });
       return;
     }
-    print(hotspot.toString());
     server = await HttpServer.bind('0.0.0.0', 8000);
     ip_adress = hotspot['ipadress'];
     setState(() {
@@ -50,45 +67,63 @@ class _DartServerState extends State<DartServer> {
     });
     print('Server started');
     server.listen((HttpRequest request) async {
-      String html_String = await HtmlGen().getHtmlString(
-          'Assets/index.html', 'Assets/styles.css', 'head', img, 'li');
-      List filelist = [];
-      try {
-        Map params = request.uri.queryParameters;
-        print(params);
-        if (params.isNotEmpty) {
-          for (String filename in img) {
-            if (params[filename] != null) {
-              filelist.add(filename);
-            }
+      print(request.uri);
+      if (request.uri.toString() == "/ws/socket") {
+        print("Hey there");
+        socket = await WebSocketTransformer.upgrade(request);
+        socket.listen((event) {
+          print('socketEvent');
+          print(event);
+          if (event.toString() == 'Vivek m nair') {
+            socketFileShare.sendFileShare(socket, extention, 'fileupdate');
           }
-          print(filelist);
-          for (String val in filelist) {
+        });
+      } else {
+        print(request.uri);
+        String html_String = await HtmlGen().getHtmlString('Assets/index.html',
+            'Assets/styles.css', 'head', ip_adress, img, 'li');
+
+        try {
+          Map params = request.uri.queryParameters;
+          print('params are-- ${params}');
+          if (params.isNotEmpty) {
+            String val = params['selected'];
+
             String file_abs_path = "${extention['$val']}";
             File _download_file = File(file_abs_path);
             if (await _download_file.exists()) {
+              int start_time = 0;
+              int stop_time = 0;
+              stopwatch.start();
               // print(lookupMimeType(file_abs_path));
               // var file_stream=await _download_file.openRead();
               // print(file_stream);
-
+              int file_length = await _download_file.length();
+              start_time = stopwatch.elapsedMilliseconds;
               print(UriData.fromString('$val',
                   encoding: Encoding.getByName('utf-8')));
               request.response
                 ..headers.set('Content-Type',
                     '${lookupMimeType(file_abs_path)}; charset=utf-8')
+                ..headers.set('Content-Length', '$file_length')
                 ..headers.set('Content-Disposition',
                     'attachment; filename="${UriData.fromString('$val', encoding: Encoding.getByName('utf-8'))}"');
               await request.response.addStream(_download_file.openRead());
+              stop_time = stopwatch.elapsedMilliseconds;
+              while (stop_time - start_time < 1000) {
+                stop_time = stopwatch.elapsedMilliseconds;
+              }
+              sendDownloadCompletedMsg(socket);
               print('Done downloading');
             }
+          } else {
+            request.response
+              ..headers.set('Content-Type', 'text/html; charset=utf-8')
+              ..write(html_String);
           }
-        } else {
-          request.response
-            ..headers.set('Content-Type', 'text/html; charset=utf-8')
-            ..write(html_String);
+        } finally {
+          request.response.close();
         }
-      } finally {
-        request.response.close();
       }
     });
   }
@@ -111,6 +146,9 @@ class _DartServerState extends State<DartServer> {
         print(fileMap.keys.toList());
         img.addAll(fileMap.keys.toList());
       });
+      if (socket != null) {
+        socketFileShare.sendFileShare(socket, extention, 'fileupdate');
+      }
     } else {
       setState(() {
         loading = false;
@@ -172,7 +210,7 @@ class _DartServerState extends State<DartServer> {
           ),
           onPressed: () {
             if (!running) {
-              startServer();
+              serverHandler();
             }
           },
         );

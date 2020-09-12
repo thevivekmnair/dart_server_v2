@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
+import android.content.ComponentName;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
@@ -79,7 +80,6 @@ public class HotspotService{
                         if (!inetAddress.isLoopbackAddress()
                                 && (inetAddress.getAddress().length == 4)) {
                             Log.d(TAG, inetAddress.getHostAddress());
-                            System.out.println("Hello");
                             ipAdress= inetAddress.getHostAddress();
                         }
                     }
@@ -93,7 +93,6 @@ public class HotspotService{
                         for (InetAddress addr : addrs) {
                             if (!addr.isLoopbackAddress()) {
                                 String sAddr = addr.getHostAddress().toUpperCase();
-                                System.out.println("Ip..."+sAddr);
                                 return sAddr;
                             }
                         }
@@ -127,6 +126,7 @@ public class HotspotService{
                     String ipAdress=getWifiApIpAddress();
                     String password=mReservation.getWifiConfiguration().preSharedKey;
                     String ssid=mReservation.getWifiConfiguration().SSID;
+                    System.out.println(password);
                     hotspotCred.put("ssid",ssid);
                     hotspotCred.put("password",password);
                     hotspotCred.put("ipadress",ipAdress);
@@ -148,7 +148,10 @@ public class HotspotService{
                     super.onFailed(reason);
                     hotspotCred.clear();
                     Toast.makeText(context, "Turn off hotspot", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                    final Intent intent=new Intent(Intent.ACTION_MAIN,null);
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    final ComponentName cn=new ComponentName("com.android.settings","com.android.settings.TetherSettings");
+                    intent.setComponent(cn);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     activity.startActivity(intent);
                     Log.d(TAG, "onFailed: ");

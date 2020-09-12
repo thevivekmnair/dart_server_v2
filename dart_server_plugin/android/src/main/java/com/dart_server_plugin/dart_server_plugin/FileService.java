@@ -10,13 +10,16 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-
+import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import android.content.ContentUris;
+import android.text.TextUtils;
 
 import javax.xml.transform.Result;
 
@@ -89,7 +92,12 @@ public class FileService{
             }else {
                 String file_path=filePathMaker(data.getData());
                 String fileName=file_path.split("/")[file_path.split("/").length-1];
-                paths.put(fileName,file_path);
+                if(fileName.equals("null")){
+                    paths.put("null","null");
+                }else{
+                    paths.put(fileName,file_path);
+                }
+               
             }
             dartServerPlugin = new DartServerPlugin();
             dartServerPlugin.returnResults(paths, result);
@@ -111,8 +119,9 @@ public class FileService{
         System.out.println(split[0]);
         if(isExternalStorageDocument(uri) && split[0].equalsIgnoreCase("primary")){
             return envDir+(split.length>1?("/"+split[1]):"");
-        }else if (isDownloadsDocument(uri) && split[0].equalsIgnoreCase("raw")){
-            return split[1];
+        }else if (isDownloadsDocument(uri) ){
+             Toast.makeText(activity, "Cant't pick files from downloads currently. Try picking through device storage directories", Toast.LENGTH_SHORT).show();
+                return "null";
         }else if(isMediaDocument(uri)){
             final String selection = MediaStore.Images.Media._ID + "=?";
             final String[] selectionArgs = new String[]{

@@ -1,22 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-<head id="head">
-    <title>
-        Information about me
-    </title>
-</head>
-<body>
-    <center>
-        <h1>
-            Welcome to file server
-        </h1>
-    <form id="checkbox">
-        <label class="container">
-        <ul id="li">
-        </ul>
-    </label>
-    <!-- <button name="Name" value="Vivekk">Download</button> -->
-    </form>
-</center>
-</body>
+    <head id="head">
+        <title>
+            File server|main
+        </title>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <center>
+            <h1>
+                Welcome to file server
+            </h1>
+            <div class="main">
+                <div class="initial-txt">
+                    <h2>Select files from your phone</h2>
+                </div>
+            </div>
+        </center>
+    </body>
+    <script>
+        var port_number;
+        // const send_testmsg_button = document.querySelector(".press-button");
+        const img_tag=document.getElementById('img-data');
+        const listTag= document.querySelector(".main");
+        const inititaltxt=document.querySelector('.initial-txt');
+        let ws=new WebSocket('ws://'+port_number+':8000/ws/socket');
+        const xhttp=new XMLHttpRequest();
+        console.log('Websocket created');
+        // send_testmsg_button.addEventListener('submit',(e)=>{
+        //     e.preventDefault();
+        //     console.log("sent!!")
+        //     ws.send('Vivek m nair');
+        // })
+        var file_cache=[];
+
+        function send_download_file_request(){
+            if(file_cache.length>0){
+                var button_value= file_cache.shift();
+                const buttonpress=document.getElementById(button_value);
+                buttonpress.click();
+            }
+        }
+          
+        ws.addEventListener('message',(ev)=>{
+            var titledata='';
+            const eventmessgae=JSON.parse(ev.data);
+           
+            if(eventmessgae['type']=='thumbnail'){
+                img_tag.setAttribute('src','data:image/jpeg;base64,'+eventmessgae['data']);
+            }
+            else if(eventmessgae['type']=='downloadpermission'){
+                console.log(eventmessgae);
+                send_download_file_request();
+            }
+        
+            else if(eventmessgae['type']=='fileupdate'){
+                if(eventmessgae['filename'].length>6){
+                titledata=eventmessgae['filename'].substr(0,6)+"..."+eventmessgae['filename'].substr(eventmessgae['filename'].length-4,eventmessgae['filename'].length-1);
+                }else{
+                    titledata=eventmessgae['filename'];
+                }
+                const keys=[];
+                let template=``;
+                    template +=`
+                    <div class="card">
+                        <div class="image">
+                            <img src="data:image/jpeg;base64,${eventmessgae['data']}" id="img-data">
+                        </div>
+                        <div class="title">
+                            <h3>${titledata}</h3>
+                        </div>
+                        <div class="button">
+                            <form>
+                                <button class="DownloadButton" name="selected" id="${eventmessgae['filename']}" value="${eventmessgae['filename']}">Download again</button>
+                            </form>
+                        </div>
+                    </div>
+                    `
+                    console.log(keys);
+               
+                file_cache.push(eventmessgae['filename']);
+                console.log(file_cache);
+                inititaltxt.classList.add('hidden');
+                listTag.innerHTML +=template;   
+                
+            }
+        })
+    </script>
 </html>
