@@ -37,10 +37,10 @@
 
         function send_download_file_request(){
             if(file_cache.length>0 && downloadpermissionAllowed){
+                downloadpermissionAllowed=false;
                 var button_value= file_cache.shift();
                 const buttonpress=document.getElementById(button_value);
                 buttonpress.click();
-                downloadpermissionAllowed=false;
             }else{
                 setTimeout(send_download_file_request,1000);
             }

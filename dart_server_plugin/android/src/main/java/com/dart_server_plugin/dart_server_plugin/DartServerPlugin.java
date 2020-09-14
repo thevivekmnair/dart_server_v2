@@ -124,6 +124,7 @@ public class DartServerPlugin implements FlutterPlugin, MethodCallHandler, Activ
           paths.put("null","null");
           resultvar.success(paths);
         }
+        break;
       case 50:
         System.out.println("Hotspot....");
         if(hotspotService.checkHotspotState()){
@@ -135,6 +136,7 @@ public class DartServerPlugin implements FlutterPlugin, MethodCallHandler, Activ
           hotspotCred.put("ipadress","null");
           resultvar.success(hotspotCred);
         }
+        break;
     }
     return true;
   }

@@ -136,6 +136,7 @@ public class HotspotService{
         Method method = null;
         HashMap<String,String> hotspotCred=new HashMap<>();
         try {
+             String ipAdress="";
             method = wifiManager.getClass().getDeclaredMethod("getWifiApState");
             method.setAccessible(true);
             int actualState = (Integer) method.invoke(wifiManager, (Object[]) null);
@@ -150,9 +151,16 @@ public class HotspotService{
                     break;
                 case 13:
                     System.out.println("13...");
-                    String ipAdress=getWifiApIpAddress();
+                    ipAdress=getWifiApIpAddress();
+                    if(ipAdress.length()>12){
+                        turnOnMobileHotspot();
+                        break;
+                    }
                     hotspotCred.put("ipadress",ipAdress);
                     dartServerPlugin.returnResults(hotspotCred,result);
+                    break;
+                case 12:
+                    turnOnMobileHotspot();
                     break;
 
             }
