@@ -93,7 +93,7 @@ public class HotspotService{
                     for (NetworkInterface intf1 : interfaces) {
                         List<InetAddress> addrs = Collections.list(intf1.getInetAddresses());
                         for (InetAddress addr : addrs) {
-                            if (!addr.isLoopbackAddress()) {
+                            if (!addr.isLoopbackAddress()&& (addr.getAddress().length == 4)) {
                                 String sAddr = addr.getHostAddress().toUpperCase();
                                 return sAddr;
                             }
@@ -130,7 +130,7 @@ public class HotspotService{
         return false;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    // @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void turnOnMobileHotspot(){
         dartServerPlugin= new DartServerPlugin();
         Method method = null;
@@ -165,7 +165,7 @@ public class HotspotService{
 
             }
             System.out.println(actualState);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) {
             System.out.println("Failed....");
         }
     }
@@ -225,7 +225,7 @@ public class HotspotService{
 //         }
 //     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    // @RequiresApi(api = Build.VERSION_CODES.O)
     public void turnOnHotspot(){
         turnOnMobileHotspot();
     //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

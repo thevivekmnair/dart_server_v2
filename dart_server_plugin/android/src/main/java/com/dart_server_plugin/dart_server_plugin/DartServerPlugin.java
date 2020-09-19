@@ -98,10 +98,8 @@ public class DartServerPlugin implements FlutterPlugin, MethodCallHandler, Activ
     else if(call.method.equals("turnOnHotspot")){
         resultvar=result;
 //        hotspotService=new HotspotService(context,activity);
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         hotspotService.result=resultvar;
         hotspotService.turnOnHotspot();
-      }
     }
     else {
       result.notImplemented();
@@ -147,10 +145,7 @@ public class DartServerPlugin implements FlutterPlugin, MethodCallHandler, Activ
     switch (requestCode){
       case 10:
         if(PackageManager.PERMISSION_GRANTED==grantResults[0]){
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           hotspotService.result=resultvar;
-            // hotspotService.startLocalOnlyHotspot();
-          }
         }
         break;
       case 100:

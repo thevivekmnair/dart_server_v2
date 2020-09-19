@@ -39,6 +39,7 @@ dev_dependencies:
   flutter_native_image: ^0.0.5+2
   video_thumbnail: ^0.2.2
   path_provider: ^1.6.14
+  flare_flutter: ^2.0.6
   dart_server_plugin:
     path: ./dart_server_plugin
 # For information on the generic Dart part of this file, see the
@@ -58,6 +59,7 @@ flutter:
     - Assets/styles.css
     - Assets/file_icon.png
     - Assets/song_icon.png
+    - Assets/check_connection.flr
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

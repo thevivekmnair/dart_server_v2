@@ -31,6 +31,13 @@ class _ShareFilesScreenState extends State<ShareFilesScreen> {
 
   _ShareFilesScreenState(this.serverHandler);
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    filesMap = {};
+  }
+
   void loadingFunc(bool val) {
     setState(() {
       loading = val;
@@ -175,7 +182,7 @@ class _ProgressBarState extends State<ProgressBar> {
 
   void setStateFunc() async {
     streamSubscription = progressBarStream().listen((event) {
-      if (event.length > 0) {
+      if (event.length > 0 && mounted) {
         setState(() {
           progress = event[index];
           if (progress == 100.0) {
@@ -202,7 +209,7 @@ class _ProgressBarState extends State<ProgressBar> {
                 value: progress / 100,
               ),
         Text(
-          progress == 0 ? 'Waiting' : "${progress.round().toString()}%",
+          progress == 0 ? 'Waiting...' : "${progress.round().toString()}%",
           style: TextStyle(color: Colors.white, fontSize: 15),
         ),
       ],

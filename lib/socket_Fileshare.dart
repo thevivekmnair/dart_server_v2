@@ -11,8 +11,8 @@ class SocketFileShare {
   Map<WebSocket, int> file_shared_count;
   String base64_encode_cache_songicon = '';
   String base64_encode_cache_fileicon = '';
-  WebSocket previousWbs;
-  bool clear_to_send_downloadmsg = true;
+  bool clearToSendDownloadmsg = true;
+  bool first_file = true;
 
   SocketFileShare() {
     file_shared_count = {};
@@ -29,10 +29,6 @@ class SocketFileShare {
     } else {
       return 0;
     }
-  }
-
-  void toggle_donwnload_permission(bool val) {
-    clear_to_send_downloadmsg = val;
   }
 
   Future<String> generateThumbnail(String path) async {
@@ -66,12 +62,12 @@ class SocketFileShare {
       Function mapFilesUpdateFunc) async {
     int start = 0;
     int finish = 0;
-    bool first_file = true;
     int count = 0;
     int currentShareCount = 0;
     int filesharedcount = checkfileSharedCount(socket);
     if (files != null) {
       for (String key in files.keys.toList()) {
+        print(first_file.toString());
         String value = files[key];
         String bas64_encoded;
         print(lookupMimeType(value));
@@ -120,7 +116,7 @@ class SocketFileShare {
           socketmessgae.addAll(
               {"type": "$type", "data": bas64_encoded, 'filename': key});
           socket.add(jsonEncode(socketmessgae));
-          if (first_file && clear_to_send_downloadmsg) {
+          if (first_file && clearToSendDownloadmsg) {
             Map<String, String> download_msg = {};
             download_msg.addAll({"type": "downloadpermission", "data": 'true'});
             await Future.delayed(Duration(milliseconds: 1000));

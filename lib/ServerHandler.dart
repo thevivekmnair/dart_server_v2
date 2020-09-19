@@ -47,7 +47,7 @@ class ServerHandler {
   void sendDownloadCompletedMsg(WebSocket wbs) {
     print("called...");
     Map<String, String> download_msg = {};
-    download_msg.addAll({"type": "downloadpermission", "data": 'true'});
+    download_msg.addAll({"type": "downloadpermission", "data": 'false'});
     wbs.add(jsonEncode(download_msg));
   }
 
@@ -70,6 +70,7 @@ class ServerHandler {
         socket = await WebSocketTransformer.upgrade(request).then((value) {
           extention = null;
           if (alreadyDidNavigation) {
+            socketFileShare.file_shared_count = {};
             Navigator.pop(buildContext);
             Navigator.push(
                 buildContext,
@@ -78,6 +79,7 @@ class ServerHandler {
                 ));
           } else {
             alreadyDidNavigation = true;
+            socketFileShare.first_file = true;
             Navigator.push(
                 buildContext,
                 MaterialPageRoute(
@@ -109,7 +111,7 @@ class ServerHandler {
               stopwatch.start();
               int file_length = await _download_file.length();
               print(file_length);
-              socketFileShare.toggle_donwnload_permission(false);
+              socketFileShare.clearToSendDownloadmsg = false;
               start_time = stopwatch.elapsedMilliseconds;
               print(UriData.fromString('$val',
                   encoding: Encoding.getByName('utf-8')));
@@ -125,7 +127,7 @@ class ServerHandler {
               while (stop_time - start_time < 1000) {
                 stop_time = stopwatch.elapsedMilliseconds;
               }
-              socketFileShare.toggle_donwnload_permission(true);
+              socketFileShare.clearToSendDownloadmsg = true;
               sendDownloadCompletedMsg(socket);
               print('Done downloading');
             }
@@ -172,6 +174,12 @@ class ServerHandler {
   void stopServer() async {
     if (server != null) {
       await server.close();
+      if (socket != null) {
+        socket.close();
+        socketFileShare.file_shared_count = {};
+        extention = null;
+      }
+      socketFileShare.first_file = true;
       interFuncdataShare(2, loaDing: false, runNing: false);
       print('Server stopped');
     }
