@@ -40,6 +40,7 @@ dev_dependencies:
   video_thumbnail: ^0.2.2
   path_provider: ^1.6.14
   flare_flutter: ^2.0.6
+  change_app_package_name: ^0.1.2
   dart_server_plugin:
     path: ./dart_server_plugin
 # For information on the generic Dart part of this file, see the

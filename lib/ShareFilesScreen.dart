@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:dart_server_v2/ServerHandler.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Map<String, double> filesMap = {};
 Stream<List> progressBarStream() async* {
@@ -59,6 +60,10 @@ class _ShareFilesScreenState extends State<ShareFilesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return Scaffold(
       backgroundColor: Color(0xff1B2631),
       appBar: AppBar(
@@ -86,31 +91,7 @@ class _ShareFilesScreenState extends State<ShareFilesScreen> {
                     uint8list = base64.decode(widgetlist[index]['img']);
                     title = filesMap.keys.toList()[index];
                     progress = filesMap.values.toList()[index].toDouble();
-                    return Container(
-                      margin: EdgeInsets.fromLTRB(4, 4, 4, 4),
-                      decoration: BoxDecoration(
-                          color: Colors.blueAccent[100].withOpacity(0.1),
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      width: MediaQuery.of(context).size.width / 1.2,
-                      height: MediaQuery.of(context).size.height / 9,
-                      child: ListTile(
-                        leading: Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              border: Border.all(color: Colors.blue, width: 2)),
-                          child: ListElement(uint8list),
-                        ),
-                        title: Text(
-                          title,
-                          maxLines: 2,
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        subtitle: ProgressBar(index),
-                      ),
-                    );
+                    return ListElement(uint8list, title, index);
                   },
                 )),
       floatingActionButton: FloatingActionButton(
@@ -134,28 +115,62 @@ class _ShareFilesScreenState extends State<ShareFilesScreen> {
   }
 }
 
-class ListElement extends StatelessWidget {
+class ListElement extends StatefulWidget {
   final Uint8List img;
-  ListElement(this.img);
+  final String title;
+  final int index;
+  ListElement(this.img, this.title, this.index);
+  @override
+  _ListElementState createState() => _ListElementState(img, title, index);
+}
+
+class _ListElementState extends State<ListElement> {
+  Uint8List img;
+  String title;
+  int index;
+  _ListElementState(this.img, this.title, this.index);
   @override
   Widget build(BuildContext context) {
-    return Image.memory(
-      img,
-      scale: 1,
-      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        if (wasSynchronouslyLoaded) {
-          return child;
-        }
-        return AnimatedOpacity(
-          child: child,
-          opacity: frame == null ? 0 : 1,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeOut,
-        );
-      },
-      fit: BoxFit.cover,
-      height: 40,
-      width: 50,
+    return Container(
+      margin: EdgeInsets.fromLTRB(4, 4, 4, 4),
+      decoration: BoxDecoration(
+          color: Colors.blueAccent[100].withOpacity(0.1),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      width: MediaQuery.of(context).size.width / 1.2,
+      height: MediaQuery.of(context).size.height / 9,
+      child: ListTile(
+        leading: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              border: Border.all(color: Colors.lightBlueAccent, width: 2)),
+          child: Image.memory(
+            img,
+            scale: 1,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded) {
+                return child;
+              }
+              return AnimatedOpacity(
+                child: child,
+                opacity: frame == null ? 0 : 1,
+                duration: const Duration(seconds: 1),
+                curve: Curves.easeOut,
+              );
+            },
+            fit: BoxFit.cover,
+            height: 40,
+            width: 50,
+          ),
+        ),
+        title: Text(
+          title,
+          maxLines: 2,
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+        subtitle: ProgressBar(index),
+      ),
     );
   }
 }
@@ -209,7 +224,7 @@ class _ProgressBarState extends State<ProgressBar> {
                 value: progress / 100,
               ),
         Text(
-          progress == 0 ? 'Waiting...' : "${progress.round().toString()}%",
+          progress == 0 ? 'waiting...' : "${progress.round().toString()}%",
           style: TextStyle(color: Colors.white, fontSize: 15),
         ),
       ],

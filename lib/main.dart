@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:dart_server_v2/socket_Fileshare.dart';
 import 'package:dart_server_v2/ServerHandler.dart';
@@ -207,6 +208,10 @@ class _DartServerState extends State<DartServer> {
   @override
   Widget build(BuildContext context) {
     server_Handler.buildContext = context;
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return Scaffold(
       backgroundColor: Color(0xff1B2631),
       appBar: AppBar(

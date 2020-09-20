@@ -116,6 +116,8 @@ class SocketFileShare {
           socketmessgae.addAll(
               {"type": "$type", "data": bas64_encoded, 'filename': key});
           socket.add(jsonEncode(socketmessgae));
+          bas64_encoded = null;
+          value = null;
           if (first_file && clearToSendDownloadmsg) {
             Map<String, String> download_msg = {};
             download_msg.addAll({"type": "downloadpermission", "data": 'true'});

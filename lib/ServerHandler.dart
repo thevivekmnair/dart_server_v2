@@ -70,6 +70,7 @@ class ServerHandler {
         socket = await WebSocketTransformer.upgrade(request).then((value) {
           extention = null;
           if (alreadyDidNavigation) {
+            socketFileShare.first_file = true;
             socketFileShare.file_shared_count = {};
             Navigator.pop(buildContext);
             Navigator.push(
