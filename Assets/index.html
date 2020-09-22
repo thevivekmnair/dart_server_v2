@@ -28,7 +28,6 @@
         const inititaltxt=document.querySelector('.initial-txt');
         let ws=new WebSocket('ws://'+port_number+':8000/ws/socket');
         const xhttp=new XMLHttpRequest();
-        console.log('Websocket created');
         // send_testmsg_button.addEventListener('submit',(e)=>{
         //     e.preventDefault();
         //     console.log("sent!!")
@@ -86,10 +85,9 @@
                         </div>
                     </div>
                     `
-                    console.log(keys);
+
                
                 file_cache.push(eventmessgae['filename']);
-                console.log(file_cache);
                 inititaltxt.classList.add('hidden');
                 listTag.innerHTML +=template;   
                 

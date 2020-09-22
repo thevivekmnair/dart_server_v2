@@ -10,9 +10,11 @@
             font-size: 30px;
             text-decoration: none;
             font-style: initial;
+            letter-spacing: 5px;
         }
         h2{
-            color: thistle;
+            color: rgb(180, 181, 255);
+            letter-spacing: 2px;
             
         }
         body{
