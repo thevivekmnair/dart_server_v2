@@ -85,6 +85,7 @@ public class HotspotService{
                             ipAdress= inetAddress.getHostAddress();
                         }
                     }
+                    return "192.168.43.1";
                 }
             }
             if(ipAdress.isEmpty()){
@@ -98,6 +99,7 @@ public class HotspotService{
                                 return sAddr;
                             }
                         }
+                         return "192.168.43.1";
                     }
                 } catch (Exception ex) { } // for now eat exceptions
                 return "";
