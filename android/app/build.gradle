@@ -47,7 +47,7 @@ android {
         applicationId "com.VIVapps.dart_server_v2"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 4.1.toInteger()
+        versionCode 5.1.toInteger()
         versionName flutterVersionName
     }
     signingConfigs {

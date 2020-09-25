@@ -68,48 +68,49 @@ public class HotspotService{
 
 
     public String getWifiApIpAddress() {
-        String ipAdress="";
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
-                    .hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                if (intf.getName().contains("wlan")) {
-                    System.out.println("Heyy");
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr
-                            .hasMoreElements();) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        System.out.println(inetAddress.getHostAddress());
-                        if (!inetAddress.isLoopbackAddress()
-                                && (inetAddress.getAddress().length == 4)) {
-                            Log.d(TAG, inetAddress.getHostAddress());
-                            ipAdress= inetAddress.getHostAddress();
-                        }
-                    }
-                    return "192.168.43.1";
-                }
-            }
-            if(ipAdress.isEmpty()){
-                try {
-                    List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-                    for (NetworkInterface intf1 : interfaces) {
-                        List<InetAddress> addrs = Collections.list(intf1.getInetAddresses());
-                        for (InetAddress addr : addrs) {
-                            if (!addr.isLoopbackAddress()&& (addr.getAddress().length == 4)) {
-                                String sAddr = addr.getHostAddress().toUpperCase();
-                                return sAddr;
-                            }
-                        }
-                         return "192.168.43.1";
-                    }
-                } catch (Exception ex) { } // for now eat exceptions
-                return "";
-            }else {
-                return ipAdress;
-            }
-        } catch (SocketException ex) {
-            System.out.println(ex.toString());
-        }
-        return null;
+        return "192.168.43.1";
+        // String ipAdress="";
+        // try {
+        //     for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
+        //             .hasMoreElements();) {
+        //         NetworkInterface intf = en.nextElement();
+        //         if (intf.getName().contains("wlan")) {
+        //             System.out.println("Heyy");
+        //             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr
+        //                     .hasMoreElements();) {
+        //                 InetAddress inetAddress = enumIpAddr.nextElement();
+        //                 System.out.println(inetAddress.getHostAddress());
+        //                 if (!inetAddress.isLoopbackAddress()
+        //                         && (inetAddress.getAddress().length == 4)) {
+        //                     Log.d(TAG, inetAddress.getHostAddress());
+        //                     ipAdress= inetAddress.getHostAddress();
+        //                 }
+        //             }
+        //             return "192.168.43.1";
+        //         }
+        //     }
+        //     if(ipAdress.isEmpty()){
+        //         try {
+        //             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+        //             for (NetworkInterface intf1 : interfaces) {
+        //                 List<InetAddress> addrs = Collections.list(intf1.getInetAddresses());
+        //                 for (InetAddress addr : addrs) {
+        //                     if (!addr.isLoopbackAddress()&& (addr.getAddress().length == 4)) {
+        //                         String sAddr = addr.getHostAddress().toUpperCase();
+        //                         return sAddr;
+        //                     }
+        //                 }
+        //                  return "192.168.43.1";
+        //             }
+        //         } catch (Exception ex) { } // for now eat exceptions
+        //         return "";
+        //     }else {
+        //         return ipAdress;
+        //     }
+        // } catch (SocketException ex) {
+        //     System.out.println(ex.toString());
+        // }
+        // return null;
     }
 
      @RequiresApi(api = Build.VERSION_CODES.KITKAT)
