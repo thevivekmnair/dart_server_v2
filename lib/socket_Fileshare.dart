@@ -32,13 +32,24 @@ class SocketFileShare {
   }
 
   Future<String> generateThumbnail(String path) async {
-    Uint8List uint8list = await VideoThumbnail.thumbnailData(
-        video: path,
-        imageFormat: ImageFormat.JPEG,
-        maxHeight: 70,
-        maxWidth: 70,
-        quality: 70);
-    return base64.encode(uint8list);
+    print("GenVideo...");
+    Uint8List uint8list;
+    try {
+      uint8list = await VideoThumbnail.thumbnailData(
+          video: path,
+          imageFormat: ImageFormat.JPEG,
+          maxHeight: 70,
+          maxWidth: 70,
+          quality: 70);
+      return base64.encode(uint8list);
+    } catch (e) {
+      print("Donee...");
+      return base64_encode_cache_fileicon.isEmpty
+          ? base64.encode((await rootBundle.load('Assets/file_icon.png'))
+              .buffer
+              .asUint8List())
+          : base64_encode_cache_fileicon;
+    }
   }
 
   Future imageCompressor(String path) async {
