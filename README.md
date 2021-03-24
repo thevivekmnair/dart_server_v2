@@ -1,6 +1,9 @@
-# dart_server_v2
+# ChromeSpot
 
-A new Flutter project.
+## Description
+  A flutter android app which solves the issue with sharing files from android to windows laptop wirelessly.
+  The workes by creating a local file server and communicating over websocket with the laptop(or any other device with
+  a web browser and wifi).
 
 ## Getting Started
 
